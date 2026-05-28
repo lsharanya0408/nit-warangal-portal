@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NITW Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="card" id="auth">
+    <h2>Login / Register</h2>
+    <input id="email" placeholder="NITW Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+    <p id="msg"></p>
+</div>
+
+<div id="dashboard" class="hidden">
+    <h2>Dashboard</h2>
+
+    <button onclick="show('att')">Attendance</button>
+    <button onclick="show('gpa')">GPA</button>
+    <button onclick="show('chart')">Chart</button>
+
+    <!-- Attendance -->
+    <div id="att" class="tab">
+        <input id="attended" placeholder="Attended">
+        <input id="total" placeholder="Total">
+        <button onclick="saveAttendance()">Save</button>
+        <p id="attResult"></p>
+    </div>
+
+    <!-- GPA -->
+    <div id="gpa" class="tab hidden">
+        <input id="grades" placeholder="Grades comma separated">
+        <button onclick="calcGPA()">Calculate</button>
+        <p id="gpaResult"></p>
+    </div>
+
+    <!-- Chart -->
+    <div id="chart" class="tab hidden">
+        <canvas id="myChart"></canvas>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
