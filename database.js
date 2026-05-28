@@ -1,35 +1,58 @@
-const Database = require("better-sqlite3");
-const db = new Database("nitw_portal.db");
+const initSqlJs = require("sql.js");
+const fs = require("fs");
+const path = require("path");
 
-// Create tables if they don't exist
-db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
-    );
+const DB_PATH = path.join(__dirname, "nitw_portal.db");
 
-    CREATE TABLE IF NOT EXISTS logins (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT,
-        logged_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
+let db;
 
-    CREATE TABLE IF NOT EXISTS attendance (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT,
-        subject TEXT,
-        attended INTEGER,
-        total INTEGER,
-        saved_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
+async function getDb() {
+    if (db) return db;
 
-    CREATE TABLE IF NOT EXISTS gpa (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT,
-        cgpa REAL,
-        saved_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-`);
+    const SQL = await initSqlJs();
 
-module.exports = db;
+    if (fs.existsSync(DB_PATH)) {
+        const fileBuffer = fs.readFileSync(DB_PATH);
+        db = new SQL.Database(fileBuffer);
+    } else {
+        db = new SQL.Database();
+    }
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS logins (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT,
+            logged_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS attendance (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT,
+            subject TEXT,
+            attended INTEGER,
+            total INTEGER,
+            saved_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS gpa (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT,
+            cgpa REAL,
+            saved_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+    `);
+
+    save();
+    return db;
+}
+
+function save() {
+    if (!db) return;
+    const data = db.export();
+    fs.writeFileSync(DB_PATH, Buffer.from(data));
+}
+
+module.exports = { getDb, save };
