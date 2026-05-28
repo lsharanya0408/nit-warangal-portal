@@ -1,47 +1,312 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>NITW Portal</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Campus Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="card" id="auth">
-    <h2>Login / Register</h2>
-    <input id="email" placeholder="NITW Email">
-    <input id="password" type="password" placeholder="Password">
-    <button onclick="register()">Register</button>
-    <button onclick="login()">Login</button>
-    <p id="msg"></p>
+<!-- AUTH -->
+<div id="auth" class="auth-wrap">
+  <div class="auth-bg"></div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon">S</div>
+      <div>
+        <div class="logo-title">Smart Campus Portal</div>
+        <div class="logo-sub">Your all-in-one student dashboard</div>
+      </div>
+    </div>
+    <div class="tab-toggle">
+      <button class="toggle-btn active" id="btn-login" onclick="switchTab('login')">Login</button>
+      <button class="toggle-btn" id="btn-register" onclick="switchTab('register')">Register</button>
+    </div>
+    <div id="form-login">
+      <input class="inp" id="login-email" type="email" placeholder="Your email address">
+      <input class="inp" id="login-pass" type="password" placeholder="Password">
+      <button class="btn-primary" onclick="login()">Login →</button>
+    </div>
+    <div id="form-register" style="display:none">
+      <input class="inp" id="reg-name" placeholder="Full Name">
+      <input class="inp" id="reg-college" placeholder="College Name (default: NIT Warangal)">
+      <input class="inp" id="reg-email" type="email" placeholder="Email address">
+      <input class="inp" id="reg-pass" type="password" placeholder="Password">
+      <button class="btn-primary" onclick="register()">Register →</button>
+    </div>
+    <p id="auth-msg" class="auth-msg"></p>
+  </div>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
-    <h2>Dashboard</h2>
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon sm">S</div>
+      <span>Campus Portal</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-btn active" onclick="showTab('home')"     id="nav-home">    <span>🏠</span> Home</button>
+      <button class="nav-btn"        onclick="showTab('att')"      id="nav-att">     <span>📊</span> Attendance</button>
+      <button class="nav-btn"        onclick="showTab('bunk')"     id="nav-bunk">    <span>🎯</span> Bunk Calc</button>
+      <button class="nav-btn"        onclick="showTab('gpa')"      id="nav-gpa">     <span>🎓</span> GPA / CGPA</button>
+      <button class="nav-btn"        onclick="showTab('assign')"   id="nav-assign">  <span>📝</span> Assignments</button>
+      <button class="nav-btn"        onclick="showTab('timetable')"id="nav-timetable"><span>🗓️</span> Timetable</button>
+      <button class="nav-btn"        onclick="showTab('holidays')" id="nav-holidays"><span>🎉</span> Holidays</button>
+      <button class="nav-btn"        onclick="showTab('exams')"    id="nav-exams">   <span>⏳</span> Exam Countdown</button>
+      <button class="nav-btn"        onclick="showTab('notes')"    id="nav-notes">   <span>🗒️</span> Notes</button>
+      <button class="nav-btn"        onclick="showTab('pomodoro')" id="nav-pomodoro"><span>🍅</span> Pomodoro</button>
+      <button class="nav-btn"        onclick="showTab('chart')"    id="nav-chart">   <span>📈</span> Analytics</button>
+    </nav>
+    <button class="logout-btn" onclick="logout()">← Logout</button>
+  </aside>
 
-    <button onclick="show('att')">Attendance</button>
-    <button onclick="show('gpa')">GPA</button>
-    <button onclick="show('chart')">Chart</button>
-
-    <!-- Attendance -->
-    <div id="att" class="tab">
-        <input id="attended" placeholder="Attended">
-        <input id="total" placeholder="Total">
-        <button onclick="saveAttendance()">Save</button>
-        <p id="attResult"></p>
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="tab-title">Home</div>
+        <div class="topbar-sub" id="user-label"></div>
+      </div>
+      <div id="topbar-right" class="topbar-badge-wrap"></div>
     </div>
 
-    <!-- GPA -->
-    <div id="gpa" class="tab hidden">
-        <input id="grades" placeholder="Grades comma separated">
-        <button onclick="calcGPA()">Calculate</button>
-        <p id="gpaResult"></p>
+    <!-- HOME -->
+    <div id="home" class="tab-content">
+      <div class="home-grid" id="home-grid"></div>
+      <div class="section-card" id="upcoming-card">
+        <div class="card-header">Upcoming This Week</div>
+        <div id="upcoming-list"></div>
+      </div>
     </div>
 
-    <!-- Chart -->
-    <div id="chart" class="tab hidden">
-        <canvas id="myChart"></canvas>
+    <!-- ATTENDANCE -->
+    <div id="att" class="tab-content hidden">
+      <div class="section-card">
+        <div class="card-header">Log Attendance</div>
+        <div class="form-row three">
+          <div class="form-group"><label>Subject</label><input class="inp" id="att-subject" placeholder="e.g. Data Structures"></div>
+          <div class="form-group"><label>Attended</label><input class="inp" id="att-attended" type="number" min="0" placeholder="28"></div>
+          <div class="form-group"><label>Total</label><input class="inp" id="att-total" type="number" min="0" placeholder="30"></div>
+        </div>
+        <button class="btn-primary w-auto" onclick="saveAttendance()">Save Attendance</button>
+        <p id="att-msg" class="form-msg"></p>
+      </div>
+      <div class="section-card" id="att-result-card" style="display:none">
+        <div class="card-header">All Subjects</div>
+        <div id="att-result-display"></div>
+      </div>
     </div>
 
+    <!-- BUNK CALC -->
+    <div id="bunk" class="tab-content hidden">
+      <div class="section-card">
+        <div class="card-header">Bunk Calculator <span class="card-hint">Min 75% required</span></div>
+        <div class="bunk-table-wrap">
+          <table class="bunk-table">
+            <thead><tr><th>#</th><th>Subject</th><th>Attended</th><th>Total</th><th>Remaining</th><th>Can Bunk</th><th></th></tr></thead>
+            <tbody id="bunk-tbody"></tbody>
+          </table>
+        </div>
+        <div class="bunk-actions">
+          <button class="btn-secondary" onclick="addBunkRow()">+ Add Subject</button>
+          <button class="btn-primary w-auto" onclick="calcBunk()">Calculate →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GPA / CGPA -->
+    <div id="gpa" class="tab-content hidden">
+      <div class="two-col">
+        <div class="section-card">
+          <div class="card-header">Semester GPA</div>
+          <label class="field-label">Grades (comma separated)</label>
+          <input class="inp" id="grades" placeholder="e.g. 9, 8, 7.5, 9, 8.5">
+          <button class="btn-primary" onclick="calcGPA()">Calculate →</button>
+          <div id="gpa-result" class="gpa-result-box" style="display:none"></div>
+        </div>
+        <div class="section-card">
+          <div class="card-header">CGPA Tracker</div>
+          <div id="cgpa-list"></div>
+          <div class="form-row two">
+            <div class="form-group"><label>Semester</label><input class="inp" id="cgpa-sem" placeholder="e.g. Sem 1"></div>
+            <div class="form-group"><label>GPA</label><input class="inp" id="cgpa-val" type="number" step="0.01" placeholder="8.50"></div>
+          </div>
+          <button class="btn-primary" onclick="addCGPA()">Add Semester →</button>
+          <div id="cgpa-avg" class="cgpa-avg" style="display:none"></div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="card-header">10-point Grade Reference</div>
+        <div class="grade-grid">
+          <div class="grade-pill ex">O → 10</div><div class="grade-pill a1">A+ → 9</div>
+          <div class="grade-pill a2">A → 8</div><div class="grade-pill b1">B+ → 7</div>
+          <div class="grade-pill b2">B → 6</div><div class="grade-pill c">C → 5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSIGNMENTS -->
+    <div id="assign" class="tab-content hidden">
+      <div class="section-card">
+        <div class="card-header">Add Assignment / Homework</div>
+        <div class="form-row three">
+          <div class="form-group"><label>Subject</label><input class="inp" id="as-subj" placeholder="Subject"></div>
+          <div class="form-group"><label>Title</label><input class="inp" id="as-title" placeholder="Assignment title"></div>
+          <div class="form-group"><label>Due Date</label><input class="inp" id="as-due" type="date"></div>
+        </div>
+        <div class="form-row two">
+          <div class="form-group">
+            <label>Type</label>
+            <select class="inp" id="as-type">
+              <option>Assignment</option><option>Homework</option><option>Project</option><option>Lab Report</option><option>Quiz</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Notes</label><input class="inp" id="as-notes" placeholder="Optional notes"></div>
+        </div>
+        <button class="btn-primary w-auto" onclick="addAssignment()">Add →</button>
+      </div>
+      <div class="section-card">
+        <div class="card-header">
+          Pending
+          <span class="card-hint" id="pending-count">0 pending</span>
+        </div>
+        <div id="assign-pending"></div>
+        <div class="card-header" style="margin-top:20px">Completed</div>
+        <div id="assign-done"></div>
+      </div>
+    </div>
+
+    <!-- TIMETABLE -->
+    <div id="timetable" class="tab-content hidden">
+      <div class="section-card">
+        <div class="card-header">Add Class</div>
+        <div class="form-row four">
+          <div class="form-group"><label>Day</label>
+            <select class="inp" id="tt-day">
+              <option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Subject</label><input class="inp" id="tt-subj" placeholder="Subject name"></div>
+          <div class="form-group"><label>Start Time</label><input class="inp" id="tt-start" type="time"></div>
+          <div class="form-group"><label>End Time</label><input class="inp" id="tt-end" type="time"></div>
+        </div>
+        <div class="form-group" style="max-width:300px"><label>Room / Venue</label><input class="inp" id="tt-room" placeholder="e.g. LH-1"></div>
+        <button class="btn-primary w-auto" onclick="addTimetable()">Add Class →</button>
+      </div>
+      <div class="section-card">
+        <div class="card-header">Weekly Schedule</div>
+        <div id="tt-display"></div>
+      </div>
+    </div>
+
+    <!-- HOLIDAYS -->
+    <div id="holidays" class="tab-content hidden">
+      <div class="section-card">
+        <div class="card-header">Add Holiday / Event</div>
+        <div class="form-row three">
+          <div class="form-group"><label>Name</label><input class="inp" id="hol-name" placeholder="e.g. Diwali"></div>
+          <div class="form-group"><label>Date</label><input class="inp" id="hol-date" type="date"></div>
+          <div class="form-group"><label>Type</label>
+            <select class="inp" id="hol-type">
+              <option>Holiday</option><option>Festival</option><option>Exam</option><option>Event</option><option>Deadline</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary w-auto" onclick="addHoliday()">Add →</button>
+      </div>
+      <div class="section-card">
+        <div class="card-header">Upcoming Holidays & Events</div>
+        <div id="hol-display"></div>
+      </div>
+    </div>
+
+    <!-- EXAM COUNTDOWN -->
+    <div id="exams" class="tab-content hidden">
+      <div class="section-card">
+        <div class="card-header">Add Exam</div>
+        <div class="form-row three">
+          <div class="form-group"><label>Subject</label><input class="inp" id="ex-subj" placeholder="e.g. DSA"></div>
+          <div class="form-group"><label>Date</label><input class="inp" id="ex-date" type="date"></div>
+          <div class="form-group"><label>Time</label><input class="inp" id="ex-time" type="time"></div>
+        </div>
+        <button class="btn-primary w-auto" onclick="addExam()">Add Exam →</button>
+      </div>
+      <div class="section-card">
+        <div class="card-header">Countdown</div>
+        <div id="exam-display"></div>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div id="notes" class="tab-content hidden">
+      <div class="notes-layout">
+        <div class="section-card notes-sidebar-panel">
+          <div class="card-header">My Notes</div>
+          <button class="btn-primary" onclick="newNote()" style="margin-bottom:12px">+ New Note</button>
+          <div id="notes-list"></div>
+        </div>
+        <div class="section-card notes-editor-panel">
+          <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center">
+            <input class="inp" id="note-title" placeholder="Note title..." style="margin:0;flex:1">
+            <select class="inp" id="note-color" style="margin:0;width:120px">
+              <option value="default">Default</option>
+              <option value="blue">Blue</option>
+              <option value="green">Green</option>
+              <option value="yellow">Yellow</option>
+              <option value="red">Red</option>
+            </select>
+            <button class="btn-primary w-auto" onclick="saveNote()">Save</button>
+            <button class="btn-secondary" onclick="deleteNote()">Delete</button>
+          </div>
+          <textarea class="note-area" id="note-body" placeholder="Start typing your note..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- POMODORO -->
+    <div id="pomodoro" class="tab-content hidden">
+      <div class="pomo-wrap">
+        <div class="section-card pomo-card">
+          <div class="pomo-mode-btns">
+            <button class="pomo-mode active" id="pm-focus"    onclick="setPomoMode('focus')">Focus</button>
+            <button class="pomo-mode"         id="pm-short"    onclick="setPomoMode('short')">Short Break</button>
+            <button class="pomo-mode"         id="pm-long"     onclick="setPomoMode('long')">Long Break</button>
+          </div>
+          <div class="pomo-timer" id="pomo-display">25:00</div>
+          <div class="pomo-session" id="pomo-session">Session 1</div>
+          <div class="pomo-progress-wrap"><div class="pomo-progress-bar" id="pomo-bar"></div></div>
+          <div class="pomo-controls">
+            <button class="pomo-btn" onclick="startPomo()" id="pomo-start-btn">▶ Start</button>
+            <button class="pomo-btn secondary" onclick="resetPomo()">↺ Reset</button>
+          </div>
+          <div class="pomo-task-wrap">
+            <input class="inp" id="pomo-task" placeholder="What are you working on?">
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="card-header">Today's Stats</div>
+          <div class="pomo-stats">
+            <div class="pomo-stat"><div class="pomo-stat-val" id="pomo-count">0</div><div class="pomo-stat-label">Pomodoros</div></div>
+            <div class="pomo-stat"><div class="pomo-stat-val" id="pomo-focus-time">0m</div><div class="pomo-stat-label">Focus Time</div></div>
+            <div class="pomo-stat"><div class="pomo-stat-val" id="pomo-streak">0</div><div class="pomo-stat-label">Streak</div></div>
+          </div>
+          <div id="pomo-log" class="pomo-log"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div id="chart" class="tab-content hidden">
+      <div class="section-card">
+        <div class="card-header">Attendance Overview</div>
+        <p class="chart-hint" id="chart-hint">Log attendance to see chart</p>
+        <div class="chart-wrap"><canvas id="myChart"></canvas></div>
+      </div>
+    </div>
+
+  </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
